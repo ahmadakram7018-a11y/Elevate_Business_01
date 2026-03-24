@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure Groq client
-client = Groq(api_key=os.getenv("Groq_API_Key"))
+api_key = os.getenv("GROQ_API_KEY") or os.getenv("Groq_API_Key")
+client = Groq(api_key=api_key) if api_key else None
 MODEL_ID = "llama-3.3-70b-versatile"
 
 def classify_email(email_text):
@@ -13,6 +14,10 @@ def classify_email(email_text):
     Skill 2: Determine how important the email is using Groq.
     Returns: urgent, important, normal, or spam.
     """
+    if not client:
+        print("Groq client not initialized. Missing GROQ_API_KEY.")
+        return "normal"
+
     prompt = f"""
     You are an expert Executive Assistant. Classify this email into exactly one category:
     

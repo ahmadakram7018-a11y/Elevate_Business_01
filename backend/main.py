@@ -56,12 +56,23 @@ class SendEmailRequest(BaseModel):
     subject: str
     body: str
 
+class EmailActionRequest(BaseModel):
+    action: str # "draft" or "send"
+    reply_body: str
+
 app = FastAPI(title="Elevate Business API")
+
+# Get configuration from environment variables
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://elevate-business-01-un1m.vercel.app")
+REDIRECT_URI = os.getenv("REDIRECT_URI", f"{FRONTEND_URL}/auth/gmail/callback")
 
 # Add CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        FRONTEND_URL
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -76,16 +87,19 @@ def on_startup():
 
 @app.get("/health")
 def health_check():
+    """Check the health status of the API."""
     return {"status": "healthy"}
 
 @app.get("/")
 def read_root():
+    """Welcome endpoint for the API."""
     return {"message": "Welcome to Elevate Business API"}
 
 # --- Auth Endpoints ---
 
 @app.post("/auth/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register_user(user: UserCreate, session: Session = Depends(get_session)):
+    """Register a new user in the system."""
     db_user = session.exec(select(User).where(User.email == user.email)).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -105,6 +119,7 @@ def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), 
     session: Session = Depends(get_session)
 ):
+    """OAuth2 compatible token login, get an access token for future requests."""
     user = session.exec(select(User).where(User.email == form_data.username)).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -127,6 +142,7 @@ def login_for_access_token(
 
 @app.post("/auth/refresh")
 def refresh_access_token(refresh_token: str):
+    """Refresh the access token using a valid refresh token."""
     payload = decode_token(refresh_token)
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
@@ -144,13 +160,14 @@ def refresh_access_token(refresh_token: str):
 
 @app.get("/auth/gmail/url")
 def get_gmail_auth_url():
+    """Generate and return the Google OAuth authorization URL."""
     if not os.path.exists("credentials.json"):
         raise HTTPException(status_code=500, detail="Gmail credentials.json not configured on server.")
     
     flow = Flow.from_client_secrets_file(
         "credentials.json",
         scopes=SCOPES,
-        redirect_uri="http://localhost:3000/auth/gmail/callback"
+        redirect_uri=REDIRECT_URI
     )
     
     # Use a constant verifier to keep the flow stateless for local development
@@ -170,6 +187,7 @@ def gmail_oauth_callback(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Callback endpoint for Google OAuth (legacy or for specific flow needs)."""
     return {"message": "Endpoint ready for code exchange"}
 
 @app.post("/auth/gmail/exchange")
@@ -177,6 +195,7 @@ async def gmail_token_exchange(
     request: Request,
     session: Session = Depends(get_session)
 ):
+    """Exchange the OAuth authorization code for access and refresh tokens."""
     body = await request.json()
     code = body.get("code")
     if not code:
@@ -185,7 +204,7 @@ async def gmail_token_exchange(
     flow = Flow.from_client_secrets_file(
         "credentials.json",
         scopes=SCOPES,
-        redirect_uri="http://localhost:3000/auth/gmail/callback"
+        redirect_uri=REDIRECT_URI
     )
     
     # Must match the verifier used in get_gmail_auth_url
@@ -267,6 +286,7 @@ def get_gmail_accounts(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """List all Gmail accounts linked to the current user."""
     accounts = session.exec(
         select(GmailAccount).where(GmailAccount.user_id == current_user.id)
     ).all()
@@ -278,6 +298,7 @@ def select_gmail_account(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Select a specific Gmail account to be active for the user."""
     accounts = session.exec(
         select(GmailAccount).where(GmailAccount.user_id == current_user.id)
     ).all()
@@ -328,6 +349,7 @@ def get_active_gmail_creds(user_id: int, session: Session):
 
 @app.post("/api/chatbot/reply")
 def chatbot_reply(request: ChatbotRequest, current_user: User = Depends(get_current_user)):
+    """Get a response from the AI chatbot based on user instructions and email context."""
     reply, is_on_topic = get_chatbot_response(
         user_instruction=request.userInstruction,
         original_email=request.originalEmail,
@@ -338,6 +360,7 @@ def chatbot_reply(request: ChatbotRequest, current_user: User = Depends(get_curr
 
 @app.post("/api/email/improve")
 def improve_email(request: ImproveEmailRequest, current_user: User = Depends(get_current_user)):
+    """Improve the body of an email based on specific instructions using AI."""
     improved_body = improve_email_body(request.body, request.instruction)
     return {"improvedBody": improved_body}
 
@@ -347,6 +370,7 @@ def send_new_email(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Send a new email using the active Gmail account."""
     creds_json = get_active_gmail_creds(current_user.id, session)
     if not creds_json:
         raise HTTPException(status_code=400, detail="No active Gmail account.")
@@ -365,6 +389,7 @@ def save_new_draft(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Save a new email as a draft in the active Gmail account."""
     creds_json = get_active_gmail_creds(current_user.id, session)
     if not creds_json:
         raise HTTPException(status_code=400, detail="No active Gmail account.")
@@ -381,13 +406,8 @@ def save_new_draft(
 
 @app.get("/users/me", response_model=UserRead)
 def read_users_me(current_user: User = Depends(get_current_user)):
+    """Get the current authenticated user's profile."""
     return current_user
-
-from pydantic import BaseModel
-
-class EmailActionRequest(BaseModel):
-    action: str # "draft" or "send"
-    reply_body: str
 
 # --- Email Endpoints ---
 
@@ -398,6 +418,7 @@ def perform_email_action(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Perform an action (send or draft) on a previously fetched email."""
     db_record = session.get(EmailHistory, id)
     if not db_record or db_record.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Record not found")
@@ -441,6 +462,7 @@ def fetch_emails(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Fetch new emails from Gmail and process them (classify, summarize, generate reply)."""
     creds_json = get_active_gmail_creds(current_user.id, session)
     if not creds_json:
         return {"message": "No active Gmail account", "processed": 0, "spam": 0, "no_creds": True}
@@ -548,6 +570,7 @@ def get_email_stats(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Get statistics for the current user's emails (counts by category and status)."""
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     base_query = select(EmailHistory).where(EmailHistory.user_id == current_user.id)
     results = session.exec(base_query).all()
@@ -587,6 +610,7 @@ def get_email_history(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Retrieve the email history with optional filtering by category and status."""
     query = select(EmailHistory).where(EmailHistory.user_id == current_user.id)
     
     if status:
@@ -609,6 +633,7 @@ def update_email_history(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+    """Update specific fields of an email history record."""
     db_record = session.get(EmailHistory, id)
     if not db_record or db_record.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Record not found")

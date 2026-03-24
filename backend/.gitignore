@@ -1,0 +1,56 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Env
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# DB
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+
+# Credentials
+client_secret.json
+credentials.json
+token.json
+
+# IDE
+.vscode/
+.idea/
+
+__pycache__/
+*.pyc
+*.log
+*.db
+node_modules/
+.next/
+frontend/node_modules/
+.playwright-mcp/
+.env

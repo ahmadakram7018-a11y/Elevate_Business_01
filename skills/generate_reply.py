@@ -5,13 +5,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure Groq client
-client = Groq(api_key=os.getenv("Groq_API_Key"))
+api_key = os.getenv("GROQ_API_KEY") or os.getenv("Groq_API_Key")
+client = Groq(api_key=api_key) if api_key else None
 MODEL_ID = "llama-3.3-70b-versatile"
 
 def generate_reply(email_body, classification="normal", user_context=""):
     """
     Skill 4: Create a draft reply based on email content and importance using Groq.
     """
+    if not client:
+        print("Groq client not initialized. Missing GROQ_API_KEY.")
+        return f"Could not generate draft reply. Error: Groq API Key missing."
+
     prompt = f"""
     Generate a professional and polite email reply for the following message.
     

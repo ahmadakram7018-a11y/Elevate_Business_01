@@ -5,13 +5,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure Groq client
-client = Groq(api_key=os.getenv("Groq_API_Key"))
+api_key = os.getenv("GROQ_API_KEY") or os.getenv("Groq_API_Key")
+client = Groq(api_key=api_key) if api_key else None
 MODEL_ID = "llama-3.3-70b-versatile"
 
 def summarize_email(email_body):
     """
     Skill 3: Create a short summary of the email using Groq.
     """
+    if not client:
+        print("Groq client not initialized. Missing GROQ_API_KEY.")
+        return "Could not generate summary. Error: Groq API Key missing."
+
     prompt = f"""
     Summarize the following email in 2-3 short bullet points. 
     Highlight the main request and any deadlines.
