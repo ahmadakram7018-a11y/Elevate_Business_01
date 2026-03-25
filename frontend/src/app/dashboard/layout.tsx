@@ -21,7 +21,8 @@ import {
   Plus,
   Edit3,
   Menu,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -111,7 +112,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20 shrink-0">
             <Mail className="w-6 h-6 text-primary-foreground" />
           </div>
-          {isSidebarExpanded && <span className="font-bold text-xl text-foreground tracking-tight whitespace-nowrap">Elevate Business</span>}
+          {isSidebarExpanded && (
+            <>
+              <span className="font-bold text-xl text-foreground tracking-tight whitespace-nowrap">Elevate Business</span>
+              <button 
+                onClick={() => setIsSidebarExpanded(false)}
+                className="ml-auto p-2 md:hidden hover:bg-muted rounded-lg text-muted-foreground transition-all active:scale-95"
+                title="Close Sidebar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </>
+          )}
         </div>
 
         <div className="px-4 mb-4">
