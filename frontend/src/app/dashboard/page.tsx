@@ -156,19 +156,19 @@ export default function DashboardOverview() {
         </section>
       </div>
 
-      <div className="bg-primary/5 rounded-[2.5rem] border border-primary/10 p-12 relative overflow-hidden group">
+      <div className="bg-primary/5 rounded-[2rem] md:rounded-[2.5rem] border border-primary/10 p-6 md:p-12 relative overflow-hidden group">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors duration-500"></div>
         <div className="relative z-10 text-center space-y-4 max-w-md mx-auto">
-          <div className="w-20 h-20 bg-primary text-primary-foreground rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/40 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-            <RefreshCcw className="w-10 h-10" />
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-primary text-primary-foreground rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-2xl shadow-primary/40 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+            <RefreshCcw className="w-8 h-8 md:w-10 md:h-10" />
           </div>
-          <h2 className="text-2xl font-black text-foreground">Deep Scan Inbox</h2>
-          <p className="text-muted-foreground font-medium leading-relaxed">
+          <h2 className="text-xl md:text-2xl font-black text-foreground">Deep Scan Inbox</h2>
+          <p className="text-xs md:text-sm text-muted-foreground font-medium leading-relaxed">
             Trigger our AI engine to re-scan your unread messages and generate optimized responses.
           </p>
           <button 
             onClick={handleFetchEmails}
-            className="mt-6 px-10 py-4 bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition-all font-bold shadow-xl shadow-primary/25 inline-block active:scale-95"
+            className="mt-4 md:mt-6 px-6 md:px-10 py-3 md:py-4 bg-primary text-primary-foreground rounded-xl md:rounded-2xl hover:bg-primary/90 transition-all font-bold shadow-xl shadow-primary/25 inline-block active:scale-95"
           >
             Launch Engine
           </button>

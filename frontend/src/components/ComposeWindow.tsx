@@ -83,10 +83,10 @@ export default function ComposeWindow({ compose, onClose, onUpdate, onMinimize, 
 
   return (
     <div 
-      className={`fixed bottom-0 bg-card border border-border shadow-2xl rounded-t-2xl flex flex-col z-50 transition-all duration-300 ${
-        compose.isFullscreen ? 'inset-4 w-auto h-auto rounded-2xl' : 'w-[550px] h-[520px]'
-      }`}
-      style={compose.isFullscreen ? {} : { right: `${80 + index * 570}px` }}
+      className={`fixed bottom-0 bg-card border border-border shadow-2xl flex flex-col z-50 transition-all duration-300 
+        ${compose.isFullscreen ? 'inset-0 sm:inset-4 w-full sm:w-auto h-full sm:h-auto rounded-none sm:rounded-2xl' : 'inset-0 sm:inset-auto sm:right-0 sm:bottom-0 w-full sm:w-[550px] h-full sm:h-[520px] rounded-none sm:rounded-t-2xl'}
+      `}
+      style={compose.isFullscreen || typeof window !== 'undefined' && window.innerWidth < 640 ? {} : { right: `${80 + index * 570}px` }}
     >
       {/* Header */}
       <div className="p-4 bg-muted/50 border-b border-border flex items-center justify-between rounded-t-2xl">

@@ -214,7 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="bg-primary/10 w-6 h-6 rounded-md flex items-center justify-center text-primary text-[10px] font-black border border-primary/20">
                   {activeGmailAccount?.email.charAt(0).toUpperCase() || '?'}
                 </div>
-                <span className="text-sm font-bold text-foreground truncate max-w-[180px]">
+                <span className="text-sm font-bold text-foreground truncate max-w-[100px] sm:max-w-[180px]">
                   {activeGmailAccount?.email || 'No Account Selected'}
                 </span>
                 <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${showAccountDropdown ? 'rotate-180' : ''}`} />

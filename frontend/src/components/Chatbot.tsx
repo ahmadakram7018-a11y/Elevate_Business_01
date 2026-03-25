@@ -69,7 +69,7 @@ export default function Chatbot() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {/* Chat Panel */}
       {isOpen && (
-        <div className="mb-4 w-[380px] h-[520px] bg-card border border-border rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="mb-4 w-[calc(100vw-3rem)] sm:w-[380px] h-[calc(100vh-10rem)] sm:h-[520px] bg-card border border-border rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
           <div className="p-4 bg-primary flex items-center justify-between">
             <div className="flex items-center gap-2 text-primary-foreground">

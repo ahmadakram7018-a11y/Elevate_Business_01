@@ -143,16 +143,16 @@ export default function CategoryPage() {
         <div className="grid gap-6">
           {emails.map((email) => (
             <div key={email.id} className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-all">
-              <div className="p-6 border-b border-border bg-muted/30">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
+              <div className="p-4 md:p-6 border-b border-border bg-muted/30">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-3 mb-1">
-                      <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{email.sender}</p>
+                      <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider truncate max-w-[200px]">{email.sender}</p>
                       {email.received_at && (
-                        <span className="text-[10px] text-muted-foreground font-medium">• {formatDateTime(email.received_at)}</span>
+                        <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">• {formatDateTime(email.received_at)}</span>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">{email.subject}</h3>
+                    <h3 className="text-base md:text-lg font-bold text-foreground truncate">{email.subject}</h3>
                     {email.sent_at && (
                       <div className="flex items-center gap-1.5 mt-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">
                         <CheckCircle2 className="w-3 h-3" />
@@ -160,7 +160,7 @@ export default function CategoryPage() {
                       </div>
                     )}
                   </div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  <div className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap ${
                     email.status === 'sent' ? 'bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-300' : 
                     email.status === 'drafted' ? 'bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300' : 
                     'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300'
@@ -168,39 +168,39 @@ export default function CategoryPage() {
                     {email.status.toUpperCase()}
                   </div>
                 </div>
-                <div className="bg-card p-4 rounded-xl border border-border">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">AI Summary</p>
-                  <p className="text-foreground text-sm leading-relaxed">{email.summary}</p>
+                <div className="bg-card p-3 md:p-4 rounded-xl border border-border">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase mb-1 md:mb-2">AI Summary</p>
+                  <p className="text-foreground text-xs md:text-sm leading-relaxed">{email.summary}</p>
                 </div>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="p-4 md:p-6 space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground uppercase mb-2 block">AI Generated Reply</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase mb-2 block">AI Generated Reply</label>
                   <textarea
                     value={email.generated_reply || ''}
                     onChange={(e) => handleReplyChange(email.id, e.target.value)}
-                    rows={5}
-                    className="w-full p-4 bg-muted border border-border rounded-xl text-sm text-foreground focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
+                    rows={window.innerWidth < 640 ? 4 : 5}
+                    className="w-full p-3 md:p-4 bg-muted border border-border rounded-xl text-xs md:text-sm text-foreground focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
                     placeholder="AI is generating a reply..."
                   />
                 </div>
 
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <button
                     onClick={() => handleSave(email.id)}
                     disabled={acting === email.id}
-                    className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg text-sm font-semibold transition-all"
+                    className="flex items-center justify-center gap-2 px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg text-xs md:text-sm font-semibold transition-all"
                   >
                     <Save className="w-4 h-4" />
                     Save Edit
                   </button>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
                     <button
                       onClick={() => handleAction(email.id, 'draft')}
                       disabled={acting === email.id || email.status === 'sent'}
-                      className="flex items-center gap-2 px-4 py-2 bg-card border border-border text-foreground hover:bg-muted rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-card border border-border text-foreground hover:bg-muted rounded-lg text-xs md:text-sm font-semibold transition-all disabled:opacity-50"
                     >
                       {acting === email.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileEdit className="w-4 h-4" />}
                       Create Draft
@@ -208,7 +208,7 @@ export default function CategoryPage() {
                     <button
                       onClick={() => handleAction(email.id, 'send')}
                       disabled={acting === email.id || email.status === 'sent'}
-                      className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 px-6 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs md:text-sm font-semibold transition-all disabled:opacity-50"
                     >
                       {acting === email.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                       Send Now

@@ -95,7 +95,7 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="bg-gray-800/50 p-8 rounded-[2rem] border border-white/5 backdrop-blur-sm hover:border-indigo-500/50 transition-colors">
                     <TrendingUp className="h-8 w-8 text-indigo-400 mb-4" />
